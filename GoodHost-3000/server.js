@@ -21,7 +21,35 @@ if (modeIndex !== -1 && args[modeIndex + 1]) mode = args[modeIndex + 1];
 console.log(`[System] Starting ${config.appName} v.${version}...`);
 
 
-if (mode === "mode1") app.use(cors());
+switch (mode) {
+    case "mode1":
+        app.use(cors());
+        break;
+
+    case "csp-strict":
+        app.use((req, res, next) => {
+            res.setHeader("Content-Security-Policy", "default-src 'self';");
+            next();
+        });
+        break;
+
+    case "csp-balanced":
+        app.use((req, res, next) => {
+            res.setHeader("Content-Security-Policy", "default-src 'self'; img-src *; style-src *; " +
+                "script-src 'self' http://localhost:4000 http://localhost:6001;");
+            next();
+        });
+        break;
+
+    case "csp-balanced-fetch":
+        app.use((req, res, next) => {
+            res.setHeader("Content-Security-Policy", "default-src 'self'; img-src *; style-src *; " +
+                "script-src 'self' http://localhost:4000 http://localhost:6001; connect-src 'self' http://localhost:4000");
+            next();
+        });
+        break;
+}
+
 
 app.get("/emails", (req, res) => {
     const emails = JSON.parse(fs.readFileSync(new URL("data.json", import.meta.url), "utf8"));

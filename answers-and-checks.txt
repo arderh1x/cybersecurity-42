@@ -20,3 +20,33 @@ CORS policy: No 'Access-Control-Allow-Origin' - server response doesn't have thi
 Task 7: The Malicious Toggle
     4. Analysis: Check the Network Tab. Identify which ports provided resources and which headers (like Access-Control-Allow-Origin: *) enabled this interaction.
 weather.js - status 200 - type script - requested index.html from port 3000 - GET /weather.js from port 5000
+
+
+
+labwork2:
+Task 1: The "Extreme" Security Lockdown
+    3. Observation: Refresh the app and check the console.
+Loading the stylesheet 'http://localhost:6001/theme.css' (and any other) violates the following Content Security Policy directive: "default-src 'self'". 
+Note that 'style-src-elem' was not explicitly set, so 'default-src' is used as a fallback. The action has been blocked.
+
+    ○ Does the Logo (6000) load?
+no, 'img-src' was not explicitly set
+    ○ Do the Styles (6000) load?
+no, 'style-src-elem' was not explicitly set
+    ○ Do the Support/Weather scripts (4000/5000) load?
+no, 'script-src-elem' was not explicitly set
+
+4. Analysis: Write down which parts of the UI "broke."
+successfully loaded only main.js and /emails fetch request - from same origin (default-src 'self'), everything else (images, styles, widgets) broke
+
+
+Task 2: Granular Trust (The Balance)
+3. Testing the Policy:
+    ○ Verify Success: The Logo and CSS from Port 6000 should now work. The Support Chat from Port 4000 should work.
+image-src and style-src are now allowed from everyone (*), so it worked; support chat and "react" also loaded (their origins are allowed for scripts)
+but support doesn't work completely - fetch request is "connect-src" ("default-src" uses as fallback), which isn't allowed
+idk if this was intentional, so I did extra mode for fetch from support working
+
+    ○ Verify Protection: Does the Weather Widget (Port 5000) still load?
+Loading the script 'http://localhost:5000/weather.js' violates the following Content Security Policy directive: "script-src 'self' http://localhost:4000 http://localhost:6001". 
+Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.

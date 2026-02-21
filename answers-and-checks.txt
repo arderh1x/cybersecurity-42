@@ -1,0 +1,22 @@
+labwork1:
+Task 5.1 Initial Test (0 Setup / "default" mode)
+3. Check: 
+    ○ Does the Logo and CSS from Port 6000 load?
+no, because port 6000 - (failed)net::ERR_UNSAFE_PORT
+I think it's not related with task (I found only one way to "fix" it - run chrome.exe --explicitly-allowed-ports=6000, but it feels wrong);
+so I changed port to 6001 - now everything loads correctly
+
+    ○ Does the Support Chat from Port 4000 successfully fetch data?
+clicking on button with fetch:
+Access to fetch at 'http://localhost:4000/messages' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+GET http://localhost:4000/messages net::ERR_FAILED 200 (OK)
+all scripts in other cases loaded successfully, but if they have type="module" - same error 
+
+    ○ Open Developer Tools (F12) -> Console. Identify any red CORS errors.
+ERR_UNSAFE_PORT -  https://chromium.googlesource.com/chromium/src.git/+/refs/heads/master/net/base/port_util.cc - 6000 port is for X11 
+CORS policy: No 'Access-Control-Allow-Origin' - server response doesn't have this info in its header, so by default - any origin don't allowed
+
+
+Task 7: The Malicious Toggle
+    4. Analysis: Check the Network Tab. Identify which ports provided resources and which headers (like Access-Control-Allow-Origin: *) enabled this interaction.
+weather.js - status 200 - type script - requested index.html from port 3000 - GET /weather.js from port 5000

@@ -1,0 +1,61 @@
+#username {
+    font-weight: bold;
+    font-size: 32px;
+    color: rgb(11, 11, 180);
+}
+
+.logo-container {
+    height: 50px;
+    width: 50px;
+}
+
+.logo-container img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.logo-container,
+#username {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+header {
+    height: 60px;
+    background-color: rgb(95, 100, 189);
+}
+
+
+html,
+body {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+#email-container {
+    height: calc(100vh - 60px);
+    display: flex;
+    box-sizing: border-box;
+}
+
+#email-container main {
+    flex: 3;
+    background-color: rgb(144, 148, 218);
+    padding: 10px;
+}
+
+#email-container aside {
+    flex: 1;
+    background-color: rgb(129, 133, 218);
+    padding: 10px;
+}
+
+#email-list {
+    margin: 0;
+}
+
+#email-list li {
+    cursor: pointer;
+}

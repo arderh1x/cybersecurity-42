@@ -1,0 +1,12 @@
+[
+    {
+        "sender": "Tom Crow",
+        "subject": "How to create a folder",
+        "body": "To create a new folder in Windows, right-click on an empty space on the desktop or in File Explorer, select New, then Folder."
+    },
+    {
+        "sender": "Duck Quack",
+        "subject": "Fish text",
+        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus ante, dictum ac eros nec, tincidunt pretium diam."
+    }
+]

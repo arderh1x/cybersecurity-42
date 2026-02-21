@@ -57,7 +57,16 @@ app.get("/emails", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
+    //if (mode === "mode-insecure") res.sendFile(path.join(__dirname, "index.html"));
+    let html = fs.readFileSync(path.join(__dirname, "index.html"), "utf8");
+    if (mode === "mode-sri-active") {
+        html = html.replace(`<script src="http://localhost:6001/react-mock.js"`,
+            `<script src="http://localhost:6001/react-mock.js"
+             integrity="sha256-1c47stpx27K9A9z7HBSs6KL2Q80XXUj5yxk5QTeFyKU="
+             crossorigin="anonymous"`
+        );
+    }
+    res.send(html);
 });
 
 app.get("/main.js", (req, res) => {

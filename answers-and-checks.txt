@@ -104,3 +104,14 @@ we looked to raw HTTP headers, so defense against document.cookie just didn't wo
 Task 2: Hardening against the Proxy (The Secure Flag)
     3. Observation: Notice that because the connection to the proxy is http:// (unencrypted), the browser now refuses to send the cookie
 apparently, localhost and 127.0.0.1 are secure even if http, so I changed in drivers/etc/hosts name for testing - now cookies don't send
+
+
+
+labwork6
+Task 1: The "Client-Only" Logout (Flawed Implementation)
+    6. Observation: Notice that the server still returns the private email data.
+Modifying /emails is next step, so I checked if I could get username with "deleted" cookie - yes, I can. (used Postman)
+
+Task 2: Hardening the Logout (Synchronized Termination)
+    4. Observation: Confirm that the server now rejects the request with a 401 error. The session is now truly dead.
+I already had sessions file, so I can confirm - session gets deleted from this file, so now impossible reuse deleted cookie

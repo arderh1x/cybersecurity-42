@@ -54,30 +54,11 @@ switch (mode) {
 
 }
 
+let sessions = [];
+const sessionsFile = new URL("sessions.json", import.meta.url);
+const session_TTL = 0.5 * 60 * 1000; // change first number to 2 (for 2 minutes)
 
-app.post("/login", express.text(), (req, res) => {
-    const username = req.body.trim();
-    if (!username) return res.status(400).send("Empty username field.");
-
-    const sessionID = crypto.randomUUID();
-    if (mode === "cookie-unsecure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/`);
-    if (mode === "cookie-httpOnly") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/; HttpOnly`);
-    if (mode === "cookie-secure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly; Secure;`);
-    else res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly`);
-
-    let sessions = [];
-    const sessionsFile = new URL("sessions.json", import.meta.url);
-    if (fs.existsSync(sessionsFile)) {
-        sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
-    }
-
-    sessions.push({ username: username, cookie: sessionID });
-    fs.writeFileSync(sessionsFile, JSON.stringify(sessions, null, 2)); // null is replacer (filter), 2 is space amount (for better reading)
-    res.send("Login Successful!");
-});
-
-
-app.get("/api/me", (req, res) => {
+function requireAuth(req, res, next) {
     const cookies = req.headers.cookie;
     if (!cookies) return res.status(401).send({ error: "Not logged in" });
     const cookieArr = cookies.split(";").map(c => c.trim());
@@ -85,22 +66,62 @@ app.get("/api/me", (req, res) => {
         .find(c => c.startsWith("SessionID="))
         .substring("SessionID=".length);
 
-    let sessions = [];
-    const sessionsFile = new URL("sessions.json", import.meta.url);
     if (fs.existsSync(sessionsFile)) {
         sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
     }
 
     const session = sessions.find(s => s.cookie === sessionID);
-    if (!session) return res.status(401).send({ error: "Not logged in" }); // 401 unauthorized
-    res.send({ username: session.username });
+    if (!session) return res.status(401).send({ error: "Not logged in" });
+
+    if (Date.now() - session.createdAt > session_TTL) {
+        sessions = sessions.filter(s => s !== session);
+        fs.writeFileSync(sessionsFile, JSON.stringify(sessions, null, 2));
+        return res.status(401).send({ error: "Session expired" });
+    } // delete only on request and only requested session
+
+    req.session = session;
+    next();
+}
+
+
+app.post("/api/login", express.text(), (req, res) => {
+    const username = req.body.trim();
+    if (!username) return res.status(400).send("Empty username field.");
+
+    const sessionID = crypto.randomUUID();
+    if (mode === "cookie-insecure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/`);  // ...
+    else if (mode === "cookie-httpOnly") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/; HttpOnly`);
+    else if (mode === "cookie-secure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly; Secure;`);
+    else res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly`);
+
+    if (fs.existsSync(sessionsFile)) {
+        sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
+    }
+
+    sessions.push({
+        username: username,
+        cookie: sessionID,
+        createdAt: Date.now(),
+    });
+    fs.writeFileSync(sessionsFile, JSON.stringify(sessions, null, 2)); // null is replacer (filter), 2 is space amount (for better reading)
+    res.send("Login Successful!");
 });
 
+app.get("/api/logout", requireAuth, (req, res) => {
+    sessions = sessions.filter(s => s !== req.session);
+    fs.writeFileSync(sessionsFile, JSON.stringify(sessions, null, 2));
+    res.send("Logout Successful!");
+});
 
-app.get("/api/emails", (req, res) => {
+app.get("/api/me", requireAuth, (req, res) => {
+    res.send({ username: req.session.username });
+});
+
+app.get("/api/emails", requireAuth, (req, res) => {
     const emails = JSON.parse(fs.readFileSync(new URL("emails.json", import.meta.url), "utf8"));
     res.json(emails);
 });
+
 
 app.get("/", (req, res) => {
     let html = fs.readFileSync(path.join(__dirname, "index.html"), "utf8");

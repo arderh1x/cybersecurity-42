@@ -1,6 +1,6 @@
 async function login() {
     const username = document.querySelector("#username-input").value;
-    const res = await fetch("/login", {
+    const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "text/plain" }, // should be changed if we send object
         body: username
@@ -10,7 +10,7 @@ async function login() {
 document.querySelector("#login").addEventListener("click", login);
 
 
-async function checkLogin() {
+async function checkAuth() {
     const res = await fetch("/api/me");
     const data = await res.json();
 
@@ -20,8 +20,20 @@ async function checkLogin() {
     }
     else document.querySelector("#login-info").textContent = data.error;
 }
-checkLogin();
+checkAuth();
 
+
+function logoutZombie() {
+    if (!document.cookie) return console.log("Cookie is empty or I can't see it.");
+    document.cookie = "SessionID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path =/;"; // possible only without HttpOnly
+    location.reload();
+}
+
+function logout() {
+    fetch("/api/logout").then(location.reload());
+}
+
+document.querySelector("#logout").addEventListener("click", logout);
 
 const emailList = await fetch("/api/emails").then(res => res.json());
 

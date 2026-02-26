@@ -74,3 +74,21 @@ Task 3: SRI with Versioning
     3. Task for Students: Update the integrity attribute in index.html to match the new v1.0.1 file to restore functionality.
 2GvbKTD66J8otV0y9zaQ2sTUOPVGAuLE1wB+ZP2Rrvc= - old hash
 1c47stpx27K9A9z7HBSs6KL2Q80XXUj5yxk5QTeFyKU= - new hash, changed only one number in file
+
+
+labwork4
+Task 2: The "XSS-to-Cookie" Theft
+    2. Observation: Refresh the Mail App after logging in.
+my implementation accidentally partially broke theft - can't get user immediately after script loading
+but yes, still see cookie
+
+    3. Verification: Check the terminal logs of your WeatherApp (Port 5000). You should see the stolen SessionID appearing there.
+Adblock can block it.
+
+Task 3: Hardening with HttpOnly
+    ○ Does the attacker get the cookie now?.
+no, because document.cookie is now empty 
+
+Task 4: The Path Limit
+    2. Observation: * Try to fetch emails from http://localhost:3000/api/emails. Does the browser send the cookie?
+yes, cookie send on every /api path, but doesn't send on any other (and /other) path :)

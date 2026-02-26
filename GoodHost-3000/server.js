@@ -11,15 +11,13 @@ const __dirname = path.dirname(__filename); // I did it after finding URL class.
 const app = express();
 const PORT = 3000;
 
-const versionPath = new URL("version.txt", import.meta.url); // path.resolve() didn't include server directory, so I searched better way to make path
-const version = fs.readFileSync(versionPath, "utf-8").trim();
 const configPath = new URL("config.json", import.meta.url);
 const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 let mode = config.mode;
 const args = process.argv;
 const modeIndex = args.indexOf("--mode");
 if (modeIndex !== -1 && args[modeIndex + 1]) mode = args[modeIndex + 1];
-console.log(`[System] Starting ${config.appName} v.${version}...`);
+console.log(`[System] Starting ${config.appName} v.${config.version}...`);
 
 
 app.use(cors());
@@ -64,6 +62,7 @@ app.post("/login", express.text(), (req, res) => {
     const sessionID = crypto.randomUUID();
     if (mode === "cookie-unsecure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/`);
     if (mode === "cookie-httpOnly") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/; HttpOnly`);
+    if (mode === "cookie-secure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly; Secure;`);
     else res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly`);
 
     let sessions = [];

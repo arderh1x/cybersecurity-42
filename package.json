@@ -8,14 +8,16 @@
     "serve6000": "nodemon StaticHost-6000/server.js",
     "serve4000": "nodemon TrustCo-4000/server.js",
     "serve5000": "nodemon WeatherApp-5000/server.js",
-    "serve-all": "concurrently \"npm run serve3000\" \"npm run serve6000\" \"npm run serve4000\" \"npm run serve5000\""
+    "serve8080": "nodemon Proxy-8080/server.js",
+    "serve-all": "concurrently \"npm run serve3000\" \"npm run serve6000\" \"npm run serve4000\" \"npm run serve5000\" \"npm run serve8080\""
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "cors": "^2.8.6",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "express-http-proxy": "^2.1.2"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

@@ -10,10 +10,22 @@
 
 <body>
     <header>
-        <div class="logo-container">
-            <img src="http://localhost:6001/logo.png" alt="fish logo">
+        <div class="user-info">
+            <div class="logo-container">
+                <img src="http://localhost:6001/logo.png" alt="fish logo">
+            </div>
+
+            <div class="username-container">
+                <div id="login-info">Loading...</div>
+                <div id="username"></div>
+            </div>
         </div>
-        <div id="username">John Smith</div>
+
+        <div class="login-container">
+            <input type="text" id="username-input">
+            <button id="login">Login</button>
+        </div>
+
     </header>
 
     <div id="email-container">

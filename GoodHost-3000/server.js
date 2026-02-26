@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
+import crypto from "crypto";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename); // I did it after finding URL class... I'll keep both variants
@@ -23,16 +24,12 @@ console.log(`[System] Starting ${config.appName} v.${version}...`);
 
 app.use(cors());
 
-app.use((req, res, next) => {
-    res.setHeader("Content-Security-Policy", "default-src 'self'; img-src *; style-src *; " +
-        "script-src 'self' http://localhost:4000 http://localhost:6001; connect-src 'self' http://localhost:4000");
-    next();
-});
 
 switch (mode) {
     case "mode1": break;
     case "csp-balanced-fetch": break;
     case "mode-insecure": break;
+    case "mode-sri-active": break;
 
     case "csp-strict":
         app.use((req, res, next) => {
@@ -48,25 +45,73 @@ switch (mode) {
             next();
         });
         break;
+
+    case "csp-balanced-fetch":
+        app.use((req, res, next) => {
+            res.setHeader("Content-Security-Policy", "default-src 'self'; img-src *; style-src *; " +
+                "script-src 'self' http://localhost:4000 http://localhost:6001; connect-src 'self' http://localhost:4000");
+            next();
+        });
+        break; // I put back this code in switch for attack demonstration
+
 }
 
 
-app.get("/emails", (req, res) => {
-    const emails = JSON.parse(fs.readFileSync(new URL("data.json", import.meta.url), "utf8"));
+app.post("/login", express.text(), (req, res) => {
+    const username = req.body.trim();
+    if (!username) return res.status(400).send("Empty username field.");
+
+    const sessionID = crypto.randomUUID();
+    if (mode === "cookie-unsecure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/`);
+    if (mode === "cookie-httpOnly") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/; HttpOnly`);
+    else res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly`);
+
+    let sessions = [];
+    const sessionsFile = new URL("sessions.json", import.meta.url);
+    if (fs.existsSync(sessionsFile)) {
+        sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
+    }
+
+    sessions.push({ username: username, cookie: sessionID });
+    fs.writeFileSync(sessionsFile, JSON.stringify(sessions, null, 2)); // null is replacer (filter), 2 is space amount (for better reading)
+    res.send("Login Successful!");
+});
+
+
+app.get("/api/me", (req, res) => {
+    const cookies = req.headers.cookie;
+    if (!cookies) return res.status(401).send({ error: "Not logged in" });
+    const cookieArr = cookies.split(";").map(c => c.trim());
+    const sessionID = cookieArr
+        .find(c => c.startsWith("SessionID="))
+        .substring("SessionID=".length);
+
+    let sessions = [];
+    const sessionsFile = new URL("sessions.json", import.meta.url);
+    if (fs.existsSync(sessionsFile)) {
+        sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
+    }
+
+    const session = sessions.find(s => s.cookie === sessionID);
+    if (!session) return res.status(401).send({ error: "Not logged in" }); // 401 unauthorized
+    res.send({ username: session.username });
+});
+
+
+app.get("/api/emails", (req, res) => {
+    const emails = JSON.parse(fs.readFileSync(new URL("emails.json", import.meta.url), "utf8"));
     res.json(emails);
 });
 
 app.get("/", (req, res) => {
-    if (mode === "mode-sri-active") {
-        let html = fs.readFileSync(path.join(__dirname, "index.html"), "utf8");
-        html = html.replace(`<script src="http://localhost:6001/react-mock.js"`,
-            `<script src="http://localhost:6001/react-mock.js"
+    let html = fs.readFileSync(path.join(__dirname, "index.html"), "utf8");
+    html = html.replace(`<script src="http://localhost:6001/react-mock.js"`,
+        `<script src="http://localhost:6001/react-mock.js"
              integrity="sha256-1c47stpx27K9A9z7HBSs6KL2Q80XXUj5yxk5QTeFyKU="
              crossorigin="anonymous"`
-        );
-        res.send(html);
-    }
-    else res.sendFile(path.join(__dirname, "index.html"));
+    );
+
+    res.send(html);
 });
 
 app.get("/main.js", (req, res) => {

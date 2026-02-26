@@ -1,61 +1,73 @@
-#username {
-    font-weight: bold;
-    font-size: 32px;
-    color: rgb(11, 11, 180);
-}
+ .username-container {
+     font-weight: bold;
+     font-size: 32px;
+     color: rgb(40, 40, 221);
+ }
 
-.logo-container {
-    height: 50px;
-    width: 50px;
-}
+ #username {
+     color: rgb(11, 11, 180);
+ }
 
-.logo-container img {
-    height: 100%;
-    width: 100%;
-    object-fit: contain;
-}
+ .logo-container {
+     height: 50px;
+     width: 50px;
+ }
 
-.logo-container,
-#username {
-    display: inline-block;
-    vertical-align: middle;
-}
+ .logo-container img {
+     height: 100%;
+     width: 100%;
+     object-fit: contain;
+ }
 
-header {
-    height: 60px;
-    background-color: rgb(95, 100, 189);
-}
+ .logo-container,
+ .username-container,
+ #username,
+ #login-info {
+     display: inline-block;
+     vertical-align: middle;
+ }
 
 
-html,
-body {
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-}
+ header {
+     height: 60px;
+     background-color: rgb(95, 100, 189);
+     display: flex;
+     justify-content: space-between;
+ }
 
-#email-container {
-    height: calc(100vh - 60px);
-    display: flex;
-    box-sizing: border-box;
-}
+ .login-container {
+     margin-top: 20px;
+ }
 
-#email-container main {
-    flex: 3;
-    background-color: rgb(144, 148, 218);
-    padding: 10px;
-}
+ html,
+ body {
+     height: 100vh;
+     margin: 0;
+     padding: 0;
+ }
 
-#email-container aside {
-    flex: 1;
-    background-color: rgb(129, 133, 218);
-    padding: 10px;
-}
+ #email-container {
+     height: calc(100vh - 60px);
+     display: flex;
+     box-sizing: border-box;
+ }
 
-#email-list {
-    margin: 0;
-}
+ #email-container main {
+     flex: 3;
+     background-color: rgb(144, 148, 218);
+     padding: 10px;
+ }
 
-#email-list li {
-    cursor: pointer;
-}
+ #email-container aside {
+     flex: 1;
+     background-color: rgb(129, 133, 218);
+     padding: 10px;
+ }
+
+ #email-list {
+     margin: 0;
+ }
+
+ #email-list li {
+     cursor: pointer;
+ }

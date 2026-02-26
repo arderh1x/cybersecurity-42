@@ -92,3 +92,15 @@ no, because document.cookie is now empty
 Task 4: The Path Limit
     2. Observation: * Try to fetch emails from http://localhost:3000/api/emails. Does the browser send the cookie?
 yes, cookie send on every /api path, but doesn't send on any other (and /other) path :)
+
+
+
+labwork5
+Task 1: The Malicious Proxy (MitM Attack)
+1.3 The Attack Execution
+    5. Analysis: Explain why HttpOnly was insufficient here. 
+we looked to raw HTTP headers, so defense against document.cookie just didn't work - we could see whole header with all info
+
+Task 2: Hardening against the Proxy (The Secure Flag)
+    3. Observation: Notice that because the connection to the proxy is http:// (unencrypted), the browser now refuses to send the cookie
+apparently, localhost and 127.0.0.1 are secure even if http, so I changed in drivers/etc/hosts name for testing - now cookies don't send

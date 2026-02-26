@@ -50,3 +50,27 @@ idk if this was intentional, so I did extra mode for fetch from support working
     ○ Verify Protection: Does the Weather Widget (Port 5000) still load?
 Loading the script 'http://localhost:5000/weather.js' violates the following Content Security Policy directive: "script-src 'self' http://localhost:4000 http://localhost:6001". 
 Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.
+
+UPD: I forgot to change version. It was too late to add this...
+
+
+
+labwork3:
+Task 2: Implementing Subresource Integrity (SRI)
+    1. Generate the Hash: Find a tool (or use a terminal command like openssl) to generate a SHA-256 base64 hash of your original/good react-mock.js file.
+openssl dgst -sha256 -binary StaticHost-6000/public/react-mock.js | openssl base64
+
+    3. Verification (The Defense):
+    ○ Keep the CDN in Breach Mode (returning the malicious alert).
+    ○ Refresh the Mail App.
+    ○ Observation: The alert should not appear. Check the Console (F12).
+Failed to find a valid digest in the 'integrity' attribute for resource 'http://localhost:6001/react-mock.js' 
+with computed SHA-256 integrity 'JUunuikT3f6nu1swXXXMdnKCpKe/Imn4jMag5P3CUpE='. The resource has been blocked.
+
+important notice - "integrity" makes CORS-request if origin is different, so I changed mode1 behavior in StaticHost to be default (for every mode) 
+
+
+Task 3: SRI with Versioning
+    3. Task for Students: Update the integrity attribute in index.html to match the new v1.0.1 file to restore functionality.
+2GvbKTD66J8otV0y9zaQ2sTUOPVGAuLE1wB+ZP2Rrvc= - old hash
+1c47stpx27K9A9z7HBSs6KL2Q80XXUj5yxk5QTeFyKU= - new hash, changed only one number in file

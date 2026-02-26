@@ -1,5 +1,5 @@
 {
     "appName": "SecureMail Pro",
-    "version": "1.0.0",
-    "mode": "csp-balanced-fetch"
+    "version": "1.2.1",
+    "mode": "mode-sri-active"
 }

@@ -21,7 +21,12 @@ if (modeIndex !== -1 && args[modeIndex + 1]) mode = args[modeIndex + 1];
 console.log(`[System] Starting ${config.appName} v.${version}...`);
 
 
-if (mode === "mode1") app.use(cors());
+// if (mode === "mode1") app.use(cors());
+app.use(cors());
+if (mode === "breach") app.get("/react-mock.js", (req, res) => {
+    res.type("text/javascript").send(`alert("CRITICAL: CDN Compromised! Stealing data...");`);
+});
+
 
 app.use("/", express.static(path.join(__dirname, "public")));
 

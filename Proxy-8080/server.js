@@ -21,7 +21,7 @@ console.log(`[System] Starting ${config.appName} v.${config.version}...`);
 
 app.use("/", proxy("http://localhost:3000", {
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => { // proxyReqOpts - request options which will send to 3000, srcReq - client's info
-        console.log(srcReq.headers.cookie);
+        if (mode === "breach") console.log(srcReq.headers.cookie); // I forgot.
         return proxyReqOpts;
     }
 }));

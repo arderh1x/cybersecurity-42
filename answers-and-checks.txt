@@ -115,3 +115,20 @@ Modifying /emails is next step, so I checked if I could get username with "delet
 Task 2: Hardening the Logout (Synchronized Termination)
     4. Observation: Confirm that the server now rejects the request with a 401 error. The session is now truly dead.
 I already had sessions file, so I can confirm - session gets deleted from this file, so now impossible reuse deleted cookie
+
+
+
+labwork7
+Task 3: Defense via SameSite Cookies
+    3. Observation: Check the Network Tab in Developer Tools for the request sent to Port 3000.
+1) localhost:3000 can't be protected by SameSite from localhost:5000 -> same site literally, so I changed to evil.local.host:5000
+2) by default - SameSite=Lax -> allow top-level navigation and GET requests, so <img> is not working (not navigation), but link is working
+3) SameSite=Strict -> cookie just don't send in any cases to not same site
+4) SameSite=None -> only possible with Secure, and allows to <img> work
+
+Task 4: Defense via POST and CSRF Tokens (Hardening)
+4.3 Verification
+    1. Try to trigger the deletion from the Malicious Page (Port 5000) using a hidden form.
+1) methods for POST-requests is very limited
+2) only can try(!) on SameSite=None (which is not even default)
+3) need to know token

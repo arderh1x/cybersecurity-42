@@ -60,9 +60,9 @@ app.post("/login", express.text(), (req, res) => {
     if (!username) return res.status(400).send("Empty username field.");
 
     const sessionID = crypto.randomUUID();
-    if (mode === "cookie-unsecure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/`);
-    if (mode === "cookie-httpOnly") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/; HttpOnly`);
-    if (mode === "cookie-secure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly; Secure;`);
+    if (mode === "cookie-insecure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/`);
+    else if (mode === "cookie-httpOnly") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/; HttpOnly`);
+    else if (mode === "cookie-secure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly; Secure;`);
     else res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly`);
 
     let sessions = [];

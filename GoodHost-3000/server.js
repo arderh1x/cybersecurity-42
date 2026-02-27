@@ -21,7 +21,9 @@ console.log(`[System] Starting ${config.appName} v.${config.version}...`);
 
 
 app.use(cors());
-
+app.use(express.urlencoded({ extended: true }));
+app.use(express.text());
+app.use(express.json());
 
 switch (mode) {
     case "mode1": break;
@@ -54,9 +56,10 @@ switch (mode) {
 
 }
 
+
 let sessions = [];
 const sessionsFile = new URL("sessions.json", import.meta.url);
-const session_TTL = 0.5 * 60 * 1000; // change first number to 2 (for 2 minutes)
+const session_TTL = 2 * 60 * 1000; // change first number to 2 (for 2 minutes)
 
 function requireAuth(req, res, next) {
     const cookies = req.headers.cookie;
@@ -66,9 +69,7 @@ function requireAuth(req, res, next) {
         .find(c => c.startsWith("SessionID="))
         .substring("SessionID=".length);
 
-    if (fs.existsSync(sessionsFile)) {
-        sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
-    }
+    if (fs.existsSync(sessionsFile)) sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
 
     const session = sessions.find(s => s.cookie === sessionID);
     if (!session) return res.status(401).send({ error: "Not logged in" });
@@ -84,24 +85,48 @@ function requireAuth(req, res, next) {
 }
 
 
-app.post("/api/login", express.text(), (req, res) => {
+app.post("/api/login", (req, res) => {
     const username = req.body.trim();
     if (!username) return res.status(400).send("Empty username field.");
 
     const sessionID = crypto.randomUUID();
-    if (mode === "cookie-insecure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/`);  // ...
-    else if (mode === "cookie-httpOnly") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/; HttpOnly`);
-    else if (mode === "cookie-secure") res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly; Secure;`);
-    else res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly`);
+    switch (mode) {
+        case "cookie-insecure":
+            res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/;`);
+            break;
 
-    if (fs.existsSync(sessionsFile)) {
-        sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
+        case "cookie-httpOnly":
+            res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/; HttpOnly;`);
+            break;
+
+        case "cookie-secure":
+            res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly; Secure;`);
+            break;
+
+        case "cookie-sameSite-none":
+            console.log("123");
+            res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly; SameSite=None; Secure;`);
+            break;
+
+        case "cookie-sameSite-lax":
+            res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly; SameSite=Lax;`);
+            break;
+
+        case "cookie-sameSite-strict":
+            res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly; SameSite=Strict;`);
+            break;
+
+        default:
+            res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly;`);
     }
+
+    if (fs.existsSync(sessionsFile)) sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
 
     sessions.push({
         username: username,
         cookie: sessionID,
         createdAt: Date.now(),
+        _csrf_token: crypto.randomUUID() + "-T",
     });
     fs.writeFileSync(sessionsFile, JSON.stringify(sessions, null, 2)); // null is replacer (filter), 2 is space amount (for better reading)
     res.send("Login Successful!");
@@ -114,12 +139,35 @@ app.get("/api/logout", requireAuth, (req, res) => {
 });
 
 app.get("/api/me", requireAuth, (req, res) => {
-    res.send({ username: req.session.username });
+    res.send({
+        username: req.session.username,
+        _csrf_token: req.session._csrf_token,
+    });
 });
 
+
+const emailsFile = new URL("emails.json", import.meta.url);
 app.get("/api/emails", requireAuth, (req, res) => {
-    const emails = JSON.parse(fs.readFileSync(new URL("emails.json", import.meta.url), "utf8"));
+    const emails = JSON.parse(fs.readFileSync(emailsFile, "utf8"));
     res.json(emails);
+});
+
+app.get("/api/emails/delete/:id", requireAuth, (req, res) => {
+    res.status(410).send("Deprecated deletion method - insecure."); // 410 gone
+    // let emails = JSON.parse(fs.readFileSync(emailsFile, "utf8"));
+    // emails = emails.filter(e => e.id != req.params.id);
+    // fs.writeFileSync(emailsFile, JSON.stringify(emails, null, 2));
+    // res.send("deleted");
+});
+
+app.post("/api/emails/delete/:id", requireAuth, (req, res) => {
+    const token = req.body._csrf_token.trim();
+    if (token !== req.session._csrf_token) return res.status(403).send("Forbidden - CSRF.");
+
+    let emails = JSON.parse(fs.readFileSync(emailsFile, "utf8"));
+    emails = emails.filter(e => e.id != req.params.id);
+    fs.writeFileSync(emailsFile, JSON.stringify(emails, null, 2));
+    res.send("deleted");
 });
 
 
@@ -139,5 +187,10 @@ app.get("/main.js", (req, res) => {
 });
 
 app.listen(PORT, () => {
+    /* if (fs.existsSync(sessionsFile)) sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
+    sessions = sessions.filter(s => Date.now() - s.createdAt < session_TTL);
+    fs.writeFileSync(sessionsFile, JSON.stringify(sessions, null, 2));  
+    ---- clear all dead sessions on server start: can't be used with nodemon, so it's commented */
+
     console.log(`[System] Server started in mode "${mode}" on port ${PORT}.`);
 })

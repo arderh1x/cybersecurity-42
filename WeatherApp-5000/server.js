@@ -39,6 +39,9 @@ app.get("/weather.js", (req, res) => {
     else res.sendFile(path.join(__dirname, "weather.js"));
 });
 
+app.get("/weather-promo.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "weather-promo.html"));
+});
 
 app.get("/log", (req, res) => {
     const cookie = req.query.data;

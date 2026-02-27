@@ -10,6 +10,7 @@ async function login() {
 document.querySelector("#login").addEventListener("click", login);
 
 
+let token = "TEST_DATA";
 async function checkAuth() {
     const res = await fetch("/api/me");
     const data = await res.json();
@@ -17,6 +18,7 @@ async function checkAuth() {
     if (data.username) {
         document.querySelector("#login-info").textContent = "Logged in as";
         document.querySelector("#username").textContent = data.username;
+        token = data._csrf_token;
     }
     else document.querySelector("#login-info").textContent = data.error;
 }
@@ -32,18 +34,35 @@ function logoutZombie() {
 function logout() {
     fetch("/api/logout").then(location.reload());
 }
-
 document.querySelector("#logout").addEventListener("click", logout);
 
-const emailList = await fetch("/api/emails").then(res => res.json());
 
-const mainArea = document.querySelector("main");
-emailList.forEach(email => {
-    const emailEl = document.createElement("li");
-    emailEl.textContent = "From: " + email.sender;
-    emailEl.addEventListener("click", () => {
-        mainArea.innerHTML = `<p>Subject: <b>${email.subject}</b></p> <p>${email.body}</p>`;
-    });
+async function createEmails() {
+    const emailList = await fetch("/api/emails").then(res => res.json());
+    if (!emailList.error) {
 
-    document.querySelector("#email-list").append(emailEl);
-});
+        const mainArea = document.querySelector("main");
+        mainArea.textContent = "Click on email to read it.";
+        emailList.forEach(email => {
+            const emailEl = document.createElement("li");
+            emailEl.textContent = "From: " + email.sender;
+            emailEl.addEventListener("click", () => {
+                mainArea.innerHTML = `<p>Subject: <b>${email.subject}</b></p> <p>${email.body}</p>`;
+            });
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "Delete";
+
+            deleteBtn.addEventListener("click", () => {
+                fetch(`/api/emails/delete/${email.id}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ _csrf_token: token }) // for supporting form-hack
+                }).then(location.reload());
+            });
+
+            document.querySelector("#email-list").append(emailEl, deleteBtn);
+        });
+    }
+}
+createEmails();

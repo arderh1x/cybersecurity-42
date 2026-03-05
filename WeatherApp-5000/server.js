@@ -2,6 +2,7 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import cors from "cors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,6 +20,7 @@ const modeIndex = args.indexOf("--mode");
 if (modeIndex !== -1 && args[modeIndex + 1]) mode = args[modeIndex + 1]; // if --mode exists and if value after --mode also exists
 console.log(`[System] Starting ${config.appName} v.${version}...`);
 
+app.use(cors());
 
 app.get("/weather.js", (req, res) => {
     if (mode === "breach1") { // in cmd: node WeatherApp-5000/server.js --mode breach1

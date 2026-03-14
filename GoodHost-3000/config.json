@@ -1,5 +1,5 @@
 {
     "appName": "SecureMail Pro",
-    "version": "1.6.0",
-    "mode": "cookie-sameSite-none"
+    "version": "1.7.0",
+    "mode": "default"
 }

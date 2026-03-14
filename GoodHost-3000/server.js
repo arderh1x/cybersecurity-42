@@ -4,12 +4,13 @@ import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
 import crypto from "crypto";
+import https from "https";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename); // I did it after finding URL class... I'll keep both variants
 
 const app = express();
-const PORT = 3000;
+const PORT = 3443;
 
 const configPath = new URL("config.json", import.meta.url);
 const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
@@ -59,7 +60,7 @@ switch (mode) {
 
 let sessions = [];
 const sessionsFile = new URL("sessions.json", import.meta.url);
-const session_TTL = 2 * 60 * 1000; // change first number to 2 (for 2 minutes)
+const session_TTL = 100 * 60 * 1000; // change first number to 2 (for 2 minutes)
 
 function requireAuth(req, res, next) {
     const cookies = req.headers.cookie;
@@ -117,7 +118,7 @@ app.post("/api/login", (req, res) => {
             break;
 
         default:
-            res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly;`);
+            res.setHeader('Set-Cookie', `SessionID=${sessionID}; Path=/api; HttpOnly; Secure; SameSite=Strict`);
     }
 
     if (fs.existsSync(sessionsFile)) sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
@@ -186,11 +187,25 @@ app.get("/main.js", (req, res) => {
     res.sendFile(path.join(__dirname, "main.js"));
 });
 
-app.listen(PORT, () => {
-    /* if (fs.existsSync(sessionsFile)) sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
-    sessions = sessions.filter(s => Date.now() - s.createdAt < session_TTL);
-    fs.writeFileSync(sessionsFile, JSON.stringify(sessions, null, 2));  
-    ---- clear all dead sessions on server start: can't be used with nodemon, so it's commented */
 
-    console.log(`[System] Server started in mode "${mode}" on port ${PORT}.`);
+app.use((req, res, next) => {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000");
 })
+
+const options = {
+    key: fs.readFileSync(path.join(__dirname, 'key.pem')),
+    cert: fs.readFileSync(path.join('https-certificates', 'cert.pem')),
+};
+
+https.createServer(options, app).listen(PORT, () => {
+    console.log(`[System] Secure Server (HTTPS) running in mode "${mode}" on port ${PORT}`);
+});
+
+// app.listen(PORT, () => {
+//     /* if (fs.existsSync(sessionsFile)) sessions = JSON.parse(fs.readFileSync(sessionsFile, "utf8"));
+//     sessions = sessions.filter(s => Date.now() - s.createdAt < session_TTL);
+//     fs.writeFileSync(sessionsFile, JSON.stringify(sessions, null, 2));
+//     ---- clear all dead sessions on server start: can't be used with nodemon, so it's commented */
+
+//     console.log(`[System] Insecure Server started in mode "${mode}" on port ${PORT}.`);
+// })

@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "username": "Arderh0x",
+    "cookie": "b45411c2-50fe-4ae9-804d-f2e6da400eb4",
+    "createdAt": 1773529314580,
+    "_csrf_token": "4d4f1ca8-5939-4140-871a-47ec47e8c992-T"
+  },
+  {
+    "username": "bob",
+    "cookie": "18115568-f0f7-40db-b9a2-d0969b8e72c9",
+    "createdAt": 1773531114725,
+    "_csrf_token": "79863b23-dc00-4aff-9896-55688ec8ef83-T"
+  },
+  {
+    "username": "Arderh0x",
+    "cookie": "aff9bd83-1014-45bb-9827-6a90ee6cad4b",
+    "createdAt": 1773531194814,
+    "_csrf_token": "d46b93d5-8365-48f5-b77e-c02b9ead7538-T"
+  }
+]

@@ -132,3 +132,22 @@ Task 4: Defense via POST and CSRF Tokens (Hardening)
 1) methods for POST-requests is very limited
 2) only can try(!) on SameSite=None (which is not even default)
 3) need to know token
+
+
+
+labwork8
+Task 1: Generating a Self-Signed Certificate 
+I use Git Bash for this - vscode-cmd can't find openssl config
+ 
+Task 2: Upgrading the GoodHost Server to HTTPS 
+    3. Visit https://localhost:3443. Note the browser's "Security Warning".
+> This server could not prove that it is localhost; its security certificate is not trusted by your computer's operating system. 
+> This may be caused by a misconfiguration or an attacker intercepting your connection.
+we are not trusted certificate creator (because it's self-assigned crt)
+
+also - Mixed Content: The page at 'https://localhost:3443/' was loaded over HTTPS, but requested an insecure element 'http://localhost:6001/logo.png'.
+ This request was not upgraded to HTTPS because it is a local network request.
+
+Task 4: Hardening with HSTS & Secure Cookies 
+    3. Try to access the app via a regular HTTP proxy now. 
+if it's custom domain - yes, no more cookies; if it's localhost (which treated as https) - still can get

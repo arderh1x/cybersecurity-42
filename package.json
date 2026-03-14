@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve3000": "nodemon GoodHost-3000/server.js",
+    "serve3000": "concurrently \"nodemon GoodHost-3000/server.js\" \"nodemon GoodHost-3000/server-redirect.js\"",
     "serve6000": "nodemon StaticHost-6000/server.js",
     "serve4000": "nodemon TrustCo-4000/server.js",
     "serve5000": "nodemon WeatherApp-5000/server.js",

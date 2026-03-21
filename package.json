@@ -9,7 +9,8 @@
     "serve4000": "nodemon TrustCo-4000/server.js",
     "serve5000": "nodemon WeatherApp-5000/server.js",
     "serve8080": "nodemon Proxy-8080/server.js",
-    "serve-all": "concurrently \"npm run serve3000\" \"npm run serve6000\" \"npm run serve4000\" \"npm run serve5000\" \"npm run serve8080\""
+    "serve-all": "concurrently \"npm run serve3000\" \"npm run serve6000\" \"npm run serve4000\" \"npm run serve5000\" \"npm run serve8080\"",
+    "serve7777": "nodemon CampBooking-7777/server.js"
   },
   "author": "",
   "license": "ISC",

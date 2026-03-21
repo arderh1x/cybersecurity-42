@@ -151,3 +151,21 @@ also - Mixed Content: The page at 'https://localhost:3443/' was loaded over HTTP
 Task 4: Hardening with HSTS & Secure Cookies 
     3. Try to access the app via a regular HTTP proxy now. 
 if it's custom domain - yes, no more cookies; if it's localhost (which treated as https) - still can get
+
+
+
+labwork9
+Task 1: The "Chaos" Attack
+    3. Observation: Submit the form. 
+    ○ Does the browser execute the script (Cross-Site Scripting)? 
+yes, as we use data from request for generating html-response - so string <script> worked as actual tag
+    ○ Does the server accept and display the impossible age and date? 
+if don't use data type for inputs - yes, it's also possible
+
+Task 2: UI Improvement (Client-Side Validation)
+    3. Result: Observe how the browser now prevents the submission. Is the server now safe from the "Chaos Attack" in Task 1? 
+now we can't just type nonsense to form or leave empty fields, but still vulnerable to script injections
+
+Task 3: Bypassing the UI (The API Attack)
+     3. Observation: Did your HTML5 validation attributes stop this direct request? Look at your server logs or the confirmation page to see if the "garbage" data was accepted.
+my server just crashed because of empty body... added body in Postman with random values to fields (empty or incorrect) - works despite client-side validation

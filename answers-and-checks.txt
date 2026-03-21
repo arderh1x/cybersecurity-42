@@ -169,3 +169,23 @@ now we can't just type nonsense to form or leave empty fields, but still vulnera
 Task 3: Bypassing the UI (The API Attack)
      3. Observation: Did your HTML5 validation attributes stop this direct request? Look at your server logs or the confirmation page to see if the "garbage" data was accepted.
 my server just crashed because of empty body... added body in Postman with random values to fields (empty or incorrect) - works despite client-side validation
+
+
+
+labwork10
+Task 1: The Logic Override (SQL Injection) 
+    3. Observation: 
+    ○ Does the server return only the specific name you searched for? 
+    ○ Or does it return every booking in the database? 
+we get all entries - sql got request, which always true (1 = 1), so every entry is "good" for selecting
+    4. The "Nuclear" Option: Try a more destructive payload (e.g., '; DROP TABLE bookings; --).
+db.prepare() can do only one operation per time, so it didn't work.
+
+Task 2: Implementing Parameterized Queries
+    3. The Verification: Run the attack payload from Task 1 again. 
+    ○ The database should now look for a person literally named ' OR '1'='1 and return zero results. 
+I created booking with this name specifically - and it works as intended: only this booking, not everything else
+
+Task 3: The Principle of Least Privilege (PoLP) 
+    4. Result: Observe how the database itself rejects the command because the user lacks the privilege, even if the code is vulnerable. 
+SQLite doesn't have users/permissions system, but it can "ban" some actions. I created special endpoint for dropping DB - now it's blocked :D
